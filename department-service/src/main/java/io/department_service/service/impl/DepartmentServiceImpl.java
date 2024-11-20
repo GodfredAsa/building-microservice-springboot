@@ -36,6 +36,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentDto getDepartmentByCode(String code) {
         Department department = departmentRepository.getDepartmentByCode(code);
+        System.out.println(department);
         return new DepartmentDto(
                 department.getId(),
                 department.getName(),

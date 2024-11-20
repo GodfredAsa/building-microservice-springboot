@@ -3,25 +3,20 @@ package io.employee.service.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmployeeDto {
+@ToString
+public class DepartmentDto {
     @JsonProperty
-
     private Long id;
     @JsonProperty
 
-    private String firstName;
+    private String name;
     @JsonProperty
 
-    private String lastName;
+    private String description;
     @JsonProperty
 
-    private String email;
-    @JsonProperty
-
-    private String departmentCode;
+    private String code;
 }
