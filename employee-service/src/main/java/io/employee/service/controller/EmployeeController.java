@@ -1,12 +1,12 @@
 package io.employee.service.controller;
 
+import io.employee.service.dto.ApiResponseDto;
 import io.employee.service.dto.EmployeeDto;
 import io.employee.service.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("api/employees")
@@ -20,7 +20,18 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<EmployeeDto> getEmployeeByEmail(@RequestParam(name = "email") String email){
-        return new ResponseEntity<>(employeeService.getEmployeeByEmail(email), OK);
+    public ResponseEntity<ApiResponseDto> getEmployeeByEmail(@RequestParam(name = "email") String email){
+        return ResponseEntity.ok(employeeService.getEmployeeByEmail(email));
     }
+
+    @GetMapping("/webclient")
+    public ResponseEntity<ApiResponseDto> getEmployeeByEmailUsingWebclient(@RequestParam(name = "email") String email){
+        return ResponseEntity.ok(employeeService.getEmployeeByEmailUsingWebclient(email));
+    }
+
+    @GetMapping("/openfeign")
+    public ResponseEntity<ApiResponseDto> getEmployeeByEmailUsingFeignClient(@RequestParam(name = "email") String email){
+        return ResponseEntity.ok(employeeService.getEmployeeByEmailUsingFeignClient(email));
+    }
+
 }

@@ -1,13 +1,12 @@
 package io.employee.service.service;
 
+import io.employee.service.dto.ApiResponseDto;
 import io.employee.service.dto.EmployeeDto;
 
 public interface EmployeeService {
 
     EmployeeDto saveEmployee(EmployeeDto employeeDto);
-
-    EmployeeDto getEmployeeByEmail(String email);
-
-//    boolean employeeExistsByEmail(String email);
-
+    ApiResponseDto getEmployeeByEmail(String email);
+    ApiResponseDto getEmployeeByEmailUsingWebclient(String email);
+    ApiResponseDto getEmployeeByEmailUsingFeignClient(String email);
 }
