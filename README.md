@@ -87,3 +87,4 @@ NB: API Gateway centralises cross-cutting concerns like security, monitoring and
 1. Done in the API-Gateway service properties
 2. Enable the discovery locator 
 3. Manual routes creation is best as used mostly in Enterprise Applications
+4. Manual routes creation is best as used mostly in Enterprise Applications
