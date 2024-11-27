@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
@@ -33,6 +35,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
         Employee employee = EmployeeBuilder.buildEmployeeByEmployeeDto(employeeDto);
         return EmployeeMapper.mapToEmployeeDto(employeeRepository.save(employee));
+    }
+
+
+    public List<EmployeeDto> getEmployees(){
+        return employeeRepository.findAll()
+                .stream()
+                .map(EmployeeMapper::mapToEmployeeDto)
+                .toList();
     }
 
     @Override
@@ -74,6 +84,5 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employee(EmployeeMapper.mapToEmployeeDto(employee))
                 .department(departmentDto)
                 .build();
-
     }
 }

@@ -1,0 +1,14 @@
+server:
+  port: 8761  # Port for the Eureka server
+
+spring:
+  application:
+    name: SERVICE-REGISTRY
+eureka:
+  client:
+    register-with-eureka: false  # Do not register the server with itself
+    fetch-registry: false  # Do not fetch the registry
+  server:
+    enable-self-preservation: true  # Ensures safety during temporary issues
+    eviction-interval-timer-in-ms: 60000  # Eviction check interval
+
