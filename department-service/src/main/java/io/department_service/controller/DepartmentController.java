@@ -27,5 +27,4 @@ public class DepartmentController {
         DepartmentDto saveDepartmentDto = departmentService.getDepartmentByCode(code);
         return new ResponseEntity<>(saveDepartmentDto, OK);
     }
-
 }
