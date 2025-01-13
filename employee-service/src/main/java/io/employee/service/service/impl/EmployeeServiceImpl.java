@@ -11,7 +11,11 @@ import io.employee.service.mapper.EmployeeMapper;
 import io.employee.service.repository.EmployeeRepository;
 import io.employee.service.service.APIClient;
 import io.employee.service.service.EmployeeService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +26,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
+    private static Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImpl.class);
     private EmployeeRepository employeeRepository;
     private RestTemplate restTemplate;
     private WebClient webClient;
@@ -73,6 +78,66 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employee(EmployeeMapper.mapToEmployeeDto(employee))
                 .department(departmentDto)
                 .build();
+    }
+
+    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Override
+    public ApiResponseDto getEmployeeByEmailUsingResilientCircuitBreaker(String email) {
+        Employee employee = employeeRepository.getEmployeeByEmail(email);
+        if(employee == null) throw new ResourceNotFoundException("employee", email);
+        DepartmentDto departmentDto = webClient.get()
+                .uri(URL + employee.getDepartmentCode())
+                .retrieve()
+                .bodyToMono(DepartmentDto.class)
+                .block();
+
+        return ApiResponseDto
+                .builder()
+                .employee(EmployeeMapper.mapToEmployeeDto(employee))
+                .department(departmentDto)
+                .build();
+    }
+
+
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Override
+    public ApiResponseDto getEmployeeByEmailUsingRetry(String email) {
+        System.out.println("=========   RETRY-CALLING-INITIATED  =================");
+        LOGGER.info(employeeRepository.getEmployeeByEmail(email).toString());
+        Employee employee = employeeRepository.getEmployeeByEmail(email);
+        if(employee == null) throw new ResourceNotFoundException("employee", email);
+        DepartmentDto departmentDto = webClient.get()
+                .uri(URL + employee.getDepartmentCode())
+                .retrieve()
+                .bodyToMono(DepartmentDto.class)
+                .block();
+
+        return ApiResponseDto
+                .builder()
+                .employee(EmployeeMapper.mapToEmployeeDto(employee))
+                .department(departmentDto)
+                .build();
+    }
+
+//    default method implementation
+    public ApiResponseDto getDefaultDepartment(String email, Exception exception){
+        int counter = 1;
+        System.out.printf("=========   RETRY-CALLING-INITIATED %s  =================%n", counter);
+        LOGGER.info(employeeRepository.getEmployeeByEmail(email).toString());
+        Employee employee = employeeRepository.getEmployeeByEmail(email);
+        DepartmentDto defaultDepartmentDto = DepartmentDto.builder()
+                .id(1L)
+                .name("default")
+                .description("des")
+                .code("DEF101")
+                .build();
+//        if(employee == null) throw new ResourceNotFoundException("employee", email);
+        return ApiResponseDto
+                .builder()
+                .employee(EmployeeMapper.mapToEmployeeDto(employee))
+                .department(defaultDepartmentDto)
+                .build();
+
     }
 
     public ApiResponseDto getEmployeeByEmailUsingFeignClient(String email) {

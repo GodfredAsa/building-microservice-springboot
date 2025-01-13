@@ -9,4 +9,8 @@ public interface EmployeeService {
     ApiResponseDto getEmployeeByEmail(String email);
     ApiResponseDto getEmployeeByEmailUsingWebclient(String email);
     ApiResponseDto getEmployeeByEmailUsingFeignClient(String email);
+    ApiResponseDto getEmployeeByEmailUsingResilientCircuitBreaker(String email);
+    ApiResponseDto getEmployeeByEmailUsingRetry(String email);
+
+
 }

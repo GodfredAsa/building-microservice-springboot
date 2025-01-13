@@ -34,4 +34,15 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeByEmailUsingFeignClient(email));
     }
 
+    @GetMapping("/circuit-breaker")
+    public ResponseEntity<ApiResponseDto> getEmployeeByEmailUsingCircuitBreaker(@RequestParam(name = "email") String email){
+        return ResponseEntity.ok(employeeService.getEmployeeByEmailUsingResilientCircuitBreaker(email));
+    }
+
+
+    @GetMapping("/retry")
+    public ResponseEntity<ApiResponseDto> getEmployeeByEmailUsingRetry(@RequestParam(name = "email") String email){
+        return ResponseEntity.ok(employeeService.getEmployeeByEmailUsingRetry(email));
+    }
+
 }

@@ -88,3 +88,77 @@ NB: API Gateway centralises cross-cutting concerns like security, monitoring and
 2. Enable the discovery locator 
 3. Manual routes creation is best as used mostly in Enterprise Applications
 4. Manual routes creation is best as used mostly in Enterprise Applications
+
+#### EXTERNALIZE CONFIGURATION OF SERVICES USING SPRING CLOUD CONFIG SERVER
+1. When there is configuration changes do need to restart each service and its associated instances
+2. Config Server enables the externalization of the all service configurations
+3. Provides a central repository of service configuration 
+
+##### DETAILS 
+1. It's just a spring boot project with the needed dependencies.
+   - dependencies: config server, eureka discovery client, spring boot actuator
+2. All services point to it as it also points to the repository (GitHub)
+
+#### SPRING CLOUD SETBACK
+1. When changes are made to the configuration of each service in the git repository example employee-service
+   - We need to call the refresh endpoint of that service manually so imagine we make changes to each all services then we need
+   - to iterate this for all those services which is not a good experience to resolve this we use `spring cloud bus`
+   - dependency's bus model. Which introduces message broker eg `RabbitMQ or Apache Kafka` to broadcast changes to all 
+   - associated services. 
+
+#### DEVELOPMENT STEPS 
+1. Add spring-cloud-starter-bus-amqp dependency to services [department-service, employment-service]
+2. Install rabbit amq using Docker: `docker pull rabbitmq`, `docker run --rm -it -p 5672:5672 rabbitmq`
+3. RabbitMQ configuration in application.properties of the related services
+4. Create Simple REST API in employee-service
+5. Change [department-service, employment-service] application.properties file and call `/busrefresh`
+6. Test implementation
+
+#### DISTRIBUTED TRACING WITH SPRING CLOUD SLEUTH AND ZIPKIN
+1. Spring cloud sleuth for distributed tracing and
+2. Zipkin for visualising trace information through ui.
+
+- Use Distributed tracing to track request through services from start to finish.
+- Track how much time each service takes to process requests
+- Dependency added at the API-GATEWAY service
+
+#### SETTING UP ZIPKIN FOR DISTRIBUTED TRACING
+1. Download zipkin server and add to project root `https://zipkin.io/pages/quickstart.html`
+2. start the server `java -jar zipkin-server.jar`
+3. Get Zipkin dependency from start.spring.io and to the following modules 
+   - api gateway
+   - department service
+   - employee service
+4. Configure zipkin server url in the respective services
+5. Accessing the zipkin server: http://127.0.0.1:9411/
+
+#### CIRCUIT BREAKER 
+- Fall back method helps reduce cascade failures.
+- Circuit breaker prevents a dependent service from continually hitting the down service.
+- Retry mechanism retry hitting the service supposedly down multiple times.
+- Rate Limit: sets limit to the number of calls.
+
+Circuit Breaker Working
+- It maintains 3 states [opened, closed, halfOpened]
+- It helps resolve the continual calls to a service when down and save resources.
+- By alternating the desired states as needed.
+
+#### STEPS FOR IMPLEMENTING CIRCUIT BREAKER  { DID NOT WORK }
+1. Add dependency resilience4j [resilience4j, aop, actuator], 
+   - actuator for monitoring circuit breaker state 
+   - aop because actuator uses it to get logging and method information
+   - resilience 4j provides the implementation for circuit breaking.
+2. @CircuitBreaker to method calling external service.
+3. Fall back method implementation
+4. Add circuit breaker configuration in application.properties file
+5. Restart the service and demo.
+
+#### STEPS FOR IMPLEMENTING RETRY { THIS WORKED }
+1. Using @Retry on method calling external service 
+2. Fall back method implementation
+3. Add retry configuration in application.properties 
+4. Restart employee-service and test
+
+#### DOCUMENTING APIs USING SWAGGER 
+1. See JSON of API http://localhost:8082/v3/api-docs
+2. Accessing Docs http://localhost:8082/swagger-ui/index.html
